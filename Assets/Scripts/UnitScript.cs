@@ -5,6 +5,8 @@ public class UnitScript : MonoBehaviour
 {
     public float speed = 50.0f;
 
+    public bool IsSelected { get; set; }
+
     private const float CloseDist = 1.0f;
     private MouseInputHandler mouseInputHandler;
     private Vector3 targetPos;
@@ -17,8 +19,10 @@ public class UnitScript : MonoBehaviour
 
     void mouseInputHandler_OnRightClick( Vector3 position )
     {
-        targetPos = position;
-        targetPos.y = transform.position.y;
+        if ( IsSelected ) {
+            targetPos = position;
+            targetPos.y = transform.position.y;
+        }
     }
 
     void Update()

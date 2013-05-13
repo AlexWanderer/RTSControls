@@ -7,7 +7,7 @@ public class UnitManager : MonoBehaviour
     public Color DragRectColor = Color.green;
     public float DragRectAlpha = 0.5f;
 
-    private List<GameObject> units = new List<GameObject>();
+    private List<UnitScript> units = new List<UnitScript>();
 
     private Vector3 dragStartPos = Vector3.zero;
     private bool isDragging = false;
@@ -18,13 +18,14 @@ public class UnitManager : MonoBehaviour
 
         GameObject[] placedUnits = GameObject.FindGameObjectsWithTag( "Unit" );
         foreach ( GameObject unit in placedUnits ) {
-            units.Add( unit );
+            units.Add( unit.GetComponent<UnitScript>() );
         }
+        Debug.Log( "numUnits: " + units.Count );
     }
 
     void Update()
     {
-        HandleLeftMouseDown();
+        HandleLeftMouse();
     }
 
     void OnGUI()
@@ -34,8 +35,9 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    private void HandleLeftMouseDown()
+    private void HandleLeftMouse()
     {
+        // TODO: handle select with just a mouse click rather than a drag
         bool mouseDown = Input.GetMouseButton( 0 );
         bool dragStartedThisFrame = Input.GetMouseButtonDown( 0 );
 
@@ -44,13 +46,52 @@ public class UnitManager : MonoBehaviour
             isDragging = true;
         }
 
-        if ( isDragging ) {
-            if ( !mouseDown ) {
-                Vector3 dragEndPos = Input.mousePosition;
-                Debug.Log( "Dragged from " + dragStartPos + " to " + dragEndPos );
-                isDragging = false;
+        if ( isDragging && !mouseDown ) {
+            isDragging = false;
+            Vector3 dragEndPos = Input.mousePosition;
+            SelectUnits( dragStartPos, dragEndPos );
+        }
+    }
+
+    private void SelectUnits( Vector3 dragStartPos, Vector3 dragEndPos )
+    {
+        Vector3 dragStartWorld = Vector3.zero;
+        Vector3 dragEndWorld = Vector3.zero;
+        ConvertDragToWorldSpace( dragStartPos, dragEndPos, out dragStartWorld, out dragEndWorld );
+
+        float minX = Mathf.Min( dragStartWorld.x, dragEndWorld.x );
+        float maxX = Mathf.Max( dragStartWorld.x, dragEndWorld.x );
+        //float minY = Mathf.Min( dragStartWorld.y, dragEndWorld.y );
+        //float maxY = Mathf.Max( dragStartWorld.y, dragEndWorld.y );
+        float minZ = Mathf.Min( dragStartWorld.z, dragEndWorld.z );
+        float maxZ = Mathf.Max( dragStartWorld.z, dragEndWorld.z );
+
+        List<UnitScript> selectedUnits = new List<UnitScript>();
+        foreach ( UnitScript unit in units ) {
+            Vector3 pos = unit.transform.position;
+            if ( pos.x > minX && pos.x < maxX && pos.z > minZ && pos.z < maxZ ) {
+                selectedUnits.Add( unit );
+                unit.IsSelected = true;
+            } else {
+                unit.IsSelected = false;
             }
         }
+
+        Debug.Log( "Selected " + selectedUnits.Count + " units." );
+    }
+
+    // Converts mouse coords to world coords
+    private void ConvertDragToWorldSpace( Vector3 dragStartPos, Vector3 dragEndPos, out Vector3 dragStartWorld, out Vector3 dragEndWorld )
+    {
+        Ray dragStartRay = Camera.main.ScreenPointToRay( dragStartPos );
+        Ray dragEndRay = Camera.main.ScreenPointToRay( dragEndPos );
+
+        Plane groundPlane = new Plane( Vector3.up, 0 );
+        float dist = 0f;
+        groundPlane.Raycast( dragStartRay, out dist );
+        dragStartWorld = dragStartRay.GetPoint( dist );
+        groundPlane.Raycast( dragEndRay, out dist );
+        dragEndWorld = dragEndRay.GetPoint( dist );
     }
 
     private void DrawSelectionBox( Vector3 start, Vector3 end )
