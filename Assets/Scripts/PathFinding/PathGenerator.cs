@@ -21,8 +21,8 @@ public class PathGenerator : MonoBehaviour
 
         while ( openSet.Count > 0 ) {
             Vector3 currentNode = GetLowestFScore( openSet, fScores );
-            if ( Vector3.Distance( currentNode, endPos ) < 1.0f ) {
-                return ReconstructPath( cameFrom, endPos );
+            if ( CalcDist( currentNode, endPos ) < 1.0f ) {
+                return ReconstructPath( cameFrom, currentNode );
             }
 
             openSet.Remove( currentNode );
@@ -127,7 +127,7 @@ public class PathGenerator : MonoBehaviour
     private float GuessDistanceHeuristic( Vector3 startPos, Vector3 endPos )
     {
         // TODO: More robust heuristic
-        return Vector3.Distance( startPos, endPos );
+        return CalcDist( startPos, endPos );
     }
 
     private Path PlaceholderPath( Vector3 startPos, Vector3 endPos )
@@ -142,10 +142,12 @@ public class PathGenerator : MonoBehaviour
         returnVal.SetPath( path );
         return returnVal;
     }
-}
 
-private class PathNode
-{
-    int x;
-    int z;
+    private float CalcDist( Vector3 a, Vector3 b )
+    {
+        float distX = Mathf.Abs( b.x - a.x );
+        float distZ = Mathf.Abs( b.z - a.z );
+
+        return distX + distZ;
+    }
 }
