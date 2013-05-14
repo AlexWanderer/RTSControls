@@ -10,6 +10,7 @@ Input
 * **Right Click** or **Spacebar**: Move units to mouse position
 * **Number 1**: Arrange units in line formation
 * **Number 2**: Arrange units in staggered formation
+* **Arrow Keys**: Pan the camera
 
 Implementation
 --------------
