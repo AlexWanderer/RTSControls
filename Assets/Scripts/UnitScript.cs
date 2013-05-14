@@ -39,8 +39,6 @@ public class UnitScript : MonoBehaviour
             endPos.y = transform.position.y;
             currentPath = pathGenerator.FindPath( transform.position, endPos );
             targetPos = currentPath.StartPos;
-
-            currentPath.PrintDebugPath();
         }
     }
 

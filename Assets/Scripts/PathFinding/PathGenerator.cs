@@ -96,12 +96,10 @@ public class PathGenerator : MonoBehaviour
     private Path ReconstructPath( Dictionary<Vector3, Vector3> cameFrom, Vector3 currentNode )
     {
         if ( cameFrom.ContainsKey( currentNode ) ) {
-            Debug.Log( "Adding node to path: " + currentNode );
             Path p = ReconstructPath( cameFrom, cameFrom[currentNode] );
             p.AddNode( currentNode );
             return p;
         } else {
-            Debug.Log( "Starting path at: " + currentNode );
             Path p = new Path();
             p.AddNode( currentNode );
             return p;
