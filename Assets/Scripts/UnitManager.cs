@@ -61,8 +61,6 @@ public class UnitManager : MonoBehaviour
 
         float minX = Mathf.Min( dragStartWorld.x, dragEndWorld.x );
         float maxX = Mathf.Max( dragStartWorld.x, dragEndWorld.x );
-        //float minY = Mathf.Min( dragStartWorld.y, dragEndWorld.y );
-        //float maxY = Mathf.Max( dragStartWorld.y, dragEndWorld.y );
         float minZ = Mathf.Min( dragStartWorld.z, dragEndWorld.z );
         float maxZ = Mathf.Max( dragStartWorld.z, dragEndWorld.z );
 

@@ -4,8 +4,21 @@ using System.Collections;
 public class UnitScript : MonoBehaviour
 {
     public float speed = 50.0f;
+    public GameObject selectionRing;
 
-    public bool IsSelected { get; set; }
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get
+        {
+            return _isSelected;
+        }
+        set
+        {
+            _isSelected = value;
+            selectionRing.renderer.enabled = _isSelected;
+        }
+    }
 
     private const float CloseDist = 1.0f;
     private MouseInputHandler mouseInputHandler;
@@ -32,7 +45,7 @@ public class UnitScript : MonoBehaviour
             transform.LookAt( targetPos );
             transform.Translate( Vector3.forward * speed * Time.deltaTime );
             transform.position = new Vector3( transform.position.x,
-                Terrain.activeTerrain.SampleHeight( transform.position ),
+                Terrain.activeTerrain.SampleHeight( transform.position ) + 1,
                 transform.position.z );
 
             if ( Vector3.Distance( transform.position, targetPos ) <= CloseDist ) {
