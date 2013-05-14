@@ -7,6 +7,7 @@ public class MouseInputHandler : MonoBehaviour
 {
     public Terrain terrain;
     public event MouseClickHandler OnRightClick;
+    public UnitManager unitManager;
 
     void Update()
     {
@@ -22,9 +23,11 @@ public class MouseInputHandler : MonoBehaviour
         float distance = 0f;
         if ( groundPlane.Raycast( ray, out distance ) ) {
             Vector3 hitPos = ray.GetPoint( distance );
+            Vector3 selectedUnitCenter = unitManager.SelectedUnitsCenter;
+            Vector3 displacement = hitPos - selectedUnitCenter;
 
             if ( OnRightClick != null ) {
-                OnRightClick( hitPos );
+                OnRightClick( displacement );
             }
         }
     }

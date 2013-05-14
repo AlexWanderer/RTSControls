@@ -8,9 +8,24 @@ public class UnitManager : MonoBehaviour
     public float DragRectAlpha = 0.5f;
 
     private List<UnitScript> units = new List<UnitScript>();
+    private List<UnitScript> selectedUnits = new List<UnitScript>();
 
     private Vector3 dragStartPos = Vector3.zero;
     private bool isDragging = false;
+
+    public Vector3 SelectedUnitsCenter 
+    {
+        get
+        {
+            Vector3 center = Vector3.zero;
+            foreach ( UnitScript unit in selectedUnits ) {
+                center += unit.transform.position;
+            }
+            center /= selectedUnits.Count;
+
+            return center;
+        }
+    }
 
     void Start()
     {
@@ -64,7 +79,7 @@ public class UnitManager : MonoBehaviour
         float minZ = Mathf.Min( dragStartWorld.z, dragEndWorld.z );
         float maxZ = Mathf.Max( dragStartWorld.z, dragEndWorld.z );
 
-        List<UnitScript> selectedUnits = new List<UnitScript>();
+        selectedUnits = new List<UnitScript>();
         foreach ( UnitScript unit in units ) {
             Vector3 pos = unit.transform.position;
             if ( pos.x > minX && pos.x < maxX && pos.z > minZ && pos.z < maxZ ) {

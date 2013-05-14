@@ -30,10 +30,10 @@ public class UnitScript : MonoBehaviour
         mouseInputHandler.OnRightClick += new MouseClickHandler( mouseInputHandler_OnRightClick );
     }
 
-    void mouseInputHandler_OnRightClick( Vector3 position )
+    void mouseInputHandler_OnRightClick( Vector3 displacement )
     {
         if ( IsSelected ) {
-            targetPos = position;
+            targetPos = transform.position + displacement;
             targetPos.y = transform.position.y;
         }
     }
