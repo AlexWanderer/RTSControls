@@ -12,21 +12,17 @@ public class Path
         get { return path[path.Count - 1]; }
     }
 
-    private List<Vector3> path;
+    private List<Vector3> path = new List<Vector3>();
     private int currentIndex = 0;
-
-    void Start()
-    {
-        List<Vector3> emptyPath = new List<Vector3>();
-        emptyPath.Add( Vector3.zero );
-        SetPath( emptyPath );
-    }
 
     public void SetPath( List<Vector3> path )
     {
         this.path = path;
+    }
 
-        Debug.Log( "Path created from " + StartPos + " to " + EndPos );
+    public void AddNode( Vector3 node )
+    {
+        path.Add( node );
     }
 
     public Vector3 GetNextPosition()
@@ -38,5 +34,13 @@ public class Path
 
         // If not at end, return next point
         return path[++currentIndex];
+    }
+
+    public void PrintDebugPath()
+    {
+        Debug.Log( "Printing path from " + StartPos + " to " + EndPos );
+        for ( int i = 0; i < path.Count; ++i ) {
+            Debug.Log( i + ". " + path[i] );
+        }
     }
 }

@@ -5,11 +5,136 @@ public class PathGenerator : MonoBehaviour
 {
     public CollisionGridGenerator gridGenerator;
 
-    public Path FindPath(Vector3 startPos, Vector3 endPos)
+    public Path FindPath( Vector3 startPos, Vector3 endPos )
     {
+        Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
+
+        List<Vector3> closedSet = new List<Vector3>();
+        List<Vector3> openSet = new List<Vector3>();
+        openSet.Add( startPos );
+
+        Dictionary<Vector3, float> gScores = new Dictionary<Vector3, float>(); // Cost from start along best-known path
+        gScores[startPos] = 0;
+
+        Dictionary<Vector3, float> fScores = new Dictionary<Vector3, float>(); // Estimated total cost
+        fScores[startPos] = gScores[startPos] + GuessDistanceHeuristic( startPos, endPos );
+
+        while ( openSet.Count > 0 ) {
+            Vector3 currentNode = GetLowestFScore( openSet, fScores );
+            if ( Vector3.Distance( currentNode, endPos ) < 1.0f ) {
+                return ReconstructPath( cameFrom, endPos );
+            }
+
+            openSet.Remove( currentNode );
+            closedSet.Add( currentNode );
+
+            foreach ( Vector3 neighbor in GetNeigbors( currentNode ) ) {
+                float tempGScore = gScores[currentNode] + Vector3.Distance( currentNode, neighbor );
+                if ( closedSet.Contains( neighbor ) ) {
+                    if ( tempGScore >= gScores[neighbor] ) {
+                        continue;
+                    }
+                }
+
+                if ( !openSet.Contains( neighbor ) || tempGScore < gScores[neighbor] ) {
+                    cameFrom[neighbor] = currentNode;
+                    gScores[neighbor] = tempGScore;
+                    fScores[neighbor] = gScores[neighbor] + GuessDistanceHeuristic( neighbor, endPos );
+                    if ( !openSet.Contains( neighbor ) ) {
+                        openSet.Add( neighbor );
+                    }
+                }
+            }
+        }
+
+        // If we reached here, we failed to find a path. Return a straight line.
+        return PlaceholderPath( startPos, endPos );
+    }
+
+    private List<Vector3> GetNeigbors( Vector3 currentNode )
+    {
+        bool[,] collisionGrid = gridGenerator.Grid;
+        // Create list of neigbors going clockwise
+        List<Vector3> neigbors = new List<Vector3>();
+        /*
+        neigbors.Add( new Vector3( currentNode.x - 1, currentNode.y, currentNode.z + 1 ) );
+        neigbors.Add( new Vector3( currentNode.x, currentNode.y, currentNode.z + 1 ) );
+        neigbors.Add( new Vector3( currentNode.x + 1, currentNode.y, currentNode.z + 1 ) );
+        neigbors.Add( new Vector3( currentNode.x + 1, currentNode.y, currentNode.z ) );
+        neigbors.Add( new Vector3( currentNode.x + 1, currentNode.y, currentNode.z - 1 ) );
+        neigbors.Add( new Vector3( currentNode.x, currentNode.y, currentNode.z - 1 ) );
+        neigbors.Add( new Vector3( currentNode.x - 1, currentNode.y, currentNode.z - 1 ) );
+        neigbors.Add( new Vector3( currentNode.x - 1, currentNode.y, currentNode.z ) );
+         */
+
+        // TODO: Less janky version of this
+        int xPos = Mathf.FloorToInt( currentNode.x - 1 );
+        int zPos = Mathf.FloorToInt( currentNode.z );
+        if ( !collisionGrid[xPos, zPos] ) {
+            neigbors.Add( new Vector3( xPos, currentNode.y, zPos ) );
+        }
+
+        xPos = Mathf.FloorToInt( currentNode.x + 1 );
+        if ( !collisionGrid[xPos, zPos] ) {
+            neigbors.Add( new Vector3( xPos, currentNode.y, zPos ) );
+        }
+
+        xPos = Mathf.FloorToInt( currentNode.x );
+        zPos = Mathf.FloorToInt( currentNode.z - 1 );
+        if ( !collisionGrid[xPos, zPos] ) {
+            neigbors.Add( new Vector3( xPos, currentNode.y, zPos ) );
+        }
+
+        zPos = Mathf.FloorToInt( currentNode.z + 1 );
+        if ( !collisionGrid[xPos, zPos] ) {
+            neigbors.Add( new Vector3( xPos, currentNode.y, zPos ) );
+        }
+
+        return neigbors;
+    }
+
+    private Path ReconstructPath( Dictionary<Vector3, Vector3> cameFrom, Vector3 currentNode )
+    {
+        if ( cameFrom.ContainsKey( currentNode ) ) {
+            Debug.Log( "Adding node to path: " + currentNode );
+            Path p = ReconstructPath( cameFrom, cameFrom[currentNode] );
+            p.AddNode( currentNode );
+            return p;
+        } else {
+            Debug.Log( "Starting path at: " + currentNode );
+            Path p = new Path();
+            p.AddNode( currentNode );
+            return p;
+        }
+    }
+
+    private Vector3 GetLowestFScore( List<Vector3> openSet, Dictionary<Vector3, float> fScores )
+    {
+        Vector3 closestVector = openSet[0];
+        float lowestFScore = fScores[closestVector];
+
+        foreach ( Vector3 vector in openSet ) {
+            float fScore = fScores[vector];
+            if ( fScore < lowestFScore ) {
+                lowestFScore = fScore;
+                closestVector = vector;
+            }
+        }
+
+        return closestVector;
+    }
+
+    private float GuessDistanceHeuristic( Vector3 startPos, Vector3 endPos )
+    {
+        // TODO: More robust heuristic
+        return Vector3.Distance( startPos, endPos );
+    }
+
+    private Path PlaceholderPath( Vector3 startPos, Vector3 endPos )
+    {
+        Debug.Log( "Failed to find a path; creating placeholder" );
+
         List<Vector3> path = new List<Vector3>();
-        
-        // Create placeholder path
         path.Add( startPos );
         path.Add( endPos );
 
@@ -17,4 +142,10 @@ public class PathGenerator : MonoBehaviour
         returnVal.SetPath( path );
         return returnVal;
     }
+}
+
+private class PathNode
+{
+    int x;
+    int z;
 }
