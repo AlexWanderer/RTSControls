@@ -9,10 +9,7 @@ public class UnitScript : MonoBehaviour
     private bool _isSelected;
     public bool IsSelected
     {
-        get
-        {
-            return _isSelected;
-        }
+        get { return _isSelected; }
         set
         {
             _isSelected = value;
