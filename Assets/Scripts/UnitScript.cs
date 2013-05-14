@@ -51,13 +51,16 @@ public class UnitScript : MonoBehaviour
     {
         if ( TargetPos != Vector3.zero ) // TODO: more robust check
         {
-            transform.LookAt( TargetPos );
+            Vector3 targetAtSameHeight = new Vector3( TargetPos.x, transform.position.y, TargetPos.z );
+
+            transform.LookAt( targetAtSameHeight );
             transform.Translate( Vector3.forward * speed * Time.deltaTime );
             transform.position = new Vector3( transform.position.x,
                 Terrain.activeTerrain.SampleHeight( transform.position ) + 1,
                 transform.position.z );
 
-            if ( Vector3.Distance( transform.position, TargetPos ) <= CloseDist ) {
+            bool closeToTargetPos = Vector3.Distance( transform.position, targetAtSameHeight ) <= CloseDist; // Compare along same Y to prevent issues with terrain
+            if ( closeToTargetPos ) {
                 if ( currentPath != null ) {
                     TargetPos = currentPath.GetNextPosition();
                 } else {
