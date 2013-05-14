@@ -7,11 +7,13 @@ public class MouseInputHandler : MonoBehaviour
 {
     public Terrain terrain;
     public event MouseClickHandler OnRightClick;
-    public UnitManager unitManager;
+    public UnitSelectionManager unitManager;
+
+    private KeyCode RightClickAlternate = KeyCode.Space;
 
     void Update()
     {
-        if ( Input.GetMouseButtonDown( 1 ) ) {
+        if ( Input.GetMouseButtonDown( 1 ) || Input.GetKeyDown( RightClickAlternate ) ) {
             HandleRightClick();
         }
     }

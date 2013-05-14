@@ -1,31 +1,36 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class UnitManager : MonoBehaviour
+public class UnitSelectionManager : MonoBehaviour
 {
     public Texture2D WhiteTexture;
     public Color DragRectColor = Color.green;
     public float DragRectAlpha = 0.5f;
-
-    private List<UnitScript> units = new List<UnitScript>();
-    private List<UnitScript> selectedUnits = new List<UnitScript>();
-
-    private Vector3 dragStartPos = Vector3.zero;
-    private bool isDragging = false;
 
     public Vector3 SelectedUnitsCenter 
     {
         get
         {
             Vector3 center = Vector3.zero;
-            foreach ( UnitScript unit in selectedUnits ) {
+            foreach ( UnitScript unit in _selectedUnits ) {
                 center += unit.transform.position;
             }
-            center /= selectedUnits.Count;
+            center /= _selectedUnits.Count;
 
             return center;
         }
     }
+
+    public List<UnitScript> SelectedUnits
+    {
+        get { return _selectedUnits; }
+    }
+
+    private List<UnitScript> units = new List<UnitScript>();
+    private List<UnitScript> _selectedUnits = new List<UnitScript>();
+
+    private Vector3 dragStartPos = Vector3.zero;
+    private bool isDragging = false;
 
     void Start()
     {
@@ -79,18 +84,18 @@ public class UnitManager : MonoBehaviour
         float minZ = Mathf.Min( dragStartWorld.z, dragEndWorld.z );
         float maxZ = Mathf.Max( dragStartWorld.z, dragEndWorld.z );
 
-        selectedUnits = new List<UnitScript>();
+        _selectedUnits = new List<UnitScript>();
         foreach ( UnitScript unit in units ) {
             Vector3 pos = unit.transform.position;
             if ( pos.x > minX && pos.x < maxX && pos.z > minZ && pos.z < maxZ ) {
-                selectedUnits.Add( unit );
+                _selectedUnits.Add( unit );
                 unit.IsSelected = true;
             } else {
                 unit.IsSelected = false;
             }
         }
 
-        Debug.Log( "Selected " + selectedUnits.Count + " units." );
+        Debug.Log( "Selected " + _selectedUnits.Count + " units." );
     }
 
     // Converts mouse coords to world coords
