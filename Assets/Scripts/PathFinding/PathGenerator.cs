@@ -7,6 +7,15 @@ public class PathGenerator : MonoBehaviour
 
     public Path FindPath( Vector3 startPos, Vector3 endPos )
     {
+        // Check if endPos is valid
+        if ( gridGenerator.Grid[Mathf.FloorToInt( endPos.x ), Mathf.FloorToInt( endPos.z )] ) {
+            // End pos is not available; return a path with only startPos
+            Path p = new Path();
+            p.AddNode( startPos );
+            return p;
+        }
+
+        // Find a path
         Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
 
         List<Vector3> closedSet = new List<Vector3>();
