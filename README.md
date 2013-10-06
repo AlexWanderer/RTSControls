@@ -4,6 +4,8 @@ Author: *Zachary Hoefler*
 
 This unity project implements basic RTS-like controls for units. Units use pathfinding to avoid obstacles on the way to their destination, and are able to be put into formations.
 
+NOTE: The current implementation is *super* slow to calculate pathfinding. The code was written for clarity as an example/starting point rather than for performance.
+
 Input
 -----
 * **Drag the left mouse** to select units
